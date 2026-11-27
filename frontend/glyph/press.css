@@ -46,6 +46,9 @@ body { background: var(--paper); color: var(--ink); font-family: var(--body); }
 .press-control label { flex: 1 1 12rem; margin: 0; }
 .press-control button { flex: 0 0 auto; }
 .press-foot { color: var(--muted); font-size: .86rem; }
+.benchmark { margin-top: 2.2rem; border-top: 1px solid var(--rule); padding-top: 1.2rem; }
+.benchmark .table-frame { max-width: 34rem; margin-bottom: .8rem; }
+.benchmark button { margin-top: .4rem; }
 @media (max-width: 830px) { .press-grid { grid-template-columns: minmax(0, 1fr) minmax(230px, .8fr); gap: 1.2rem; } }
 @media (max-width: 680px) { .press-grid { grid-template-columns: 1fr; } .press-side, .press-inset { border-inline-start: 0; border-block-start: 1px solid var(--rule); padding: 1.3rem 0 0; } }
 @media (prefers-reduced-motion: reduce) { .glyph-work button, a.press-link { transition: none; } }

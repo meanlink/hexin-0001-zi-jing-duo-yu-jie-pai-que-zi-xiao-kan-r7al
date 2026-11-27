@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import Response
 
+from glyph.benchmark import latest_summary, measure, start_batch
 from glyph.catalogue import all_faces, register_face
 from glyph.delivery import manifest, manifest_csv
 from glyph.demo import seed
@@ -15,7 +16,7 @@ from infra.queue import enqueue
 router = APIRouter(dependencies=[Depends(access())])
 editor = access("operator", "admin")
 reviewer = access("admin")
-JOBS = {"glyph_proposals": generate}
+JOBS = {"glyph_proposals": generate, "glyph_benchmark": measure}
 
 
 @router.get("/proofs")
@@ -90,3 +91,20 @@ def export_delivery(code: str):
         media_type="text/csv; charset=utf-8",
         headers={"Content-Disposition": f'attachment; filename="{document["code"]}-r{document["revision"]}.csv"'},
     )
+
+
+@router.get("/benchmarks/latest")
+def benchmark():
+    with tx() as db:
+        return {"batch": latest_summary(db)}
+
+
+@router.post("/benchmarks", status_code=202, dependencies=[Depends(editor)])
+def measure_batch():
+    with tx() as db:
+        batch, fresh = start_batch(db)
+    return {
+        "job_id": enqueue("glyph_benchmark", {"batch_id": batch["id"]}),
+        "batch_id": batch["id"],
+        "resumed": not fresh,
+    }

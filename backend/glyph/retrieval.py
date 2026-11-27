@@ -1,7 +1,7 @@
 """Character n-gram retrieval for font packages.
 
 Each font's specimen text is a document. Fits IDF across this catalogue,
-transforms the per-glyph line context, and ranks eligible packages by cosine.
+transforms the per-glyph query context, and ranks eligible packages by cosine.
 """
 from collections import Counter
 from math import log, sqrt
@@ -28,7 +28,17 @@ def weighted(counter: Counter, inverse: dict) -> dict:
     return {gram: weight / magnitude for gram, weight in values.items()} if magnitude else {}
 
 
-def retrieve(copy_text: str, use_kind: str, faces: list[dict]) -> list[dict]:
+def line_context(copy_text: str, glyph: str) -> str:
+    """Every line showing the glyph; the default review context."""
+    return " ".join(line for line in copy_text.splitlines() if glyph in line)
+
+
+def glyph_context(copy_text: str, glyph: str) -> str:
+    """The single character on its own, without the surrounding line."""
+    return glyph
+
+
+def retrieve(copy_text: str, use_kind: str, faces: list[dict], context=line_context) -> list[dict]:
     corpus = [grams(face["specimen"]) for face in faces]
     frequency = Counter(gram for document in corpus for gram in document)
     inverse = {
@@ -38,8 +48,7 @@ def retrieve(copy_text: str, use_kind: str, faces: list[dict]) -> list[dict]:
     vectors = [weighted(document, inverse) for document in corpus]
     candidates = []
     for glyph in required_glyphs(copy_text):
-        context = " ".join(line for line in copy_text.splitlines() if glyph in line)
-        query = weighted(grams(context), inverse)
+        query = weighted(grams(context(copy_text, glyph)), inverse)
         scored = [
             (min(1.0, sum(weight * vector.get(gram, 0) for gram, weight in query.items())), face["code"])
             for face, vector in zip(faces, vectors)

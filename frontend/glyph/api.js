@@ -17,6 +17,11 @@ export const glyphApi = {
   assign: (code, form) => api(proofPath(code) + "/assignments", {method: "PUT", body: form}),
   lock: (code, revision) => api(proofPath(code) + "/lock", post({revision})),
   manifest: code => api(proofPath(code) + "/manifest"),
+  benchmark: () => api("/benchmarks/latest"),
+  measure: async () => {
+    const job = await api("/benchmarks", {method: "POST"});
+    return pollJob(job.job_id);
+  },
 };
 
 export async function downloadManifest(code, revision) {

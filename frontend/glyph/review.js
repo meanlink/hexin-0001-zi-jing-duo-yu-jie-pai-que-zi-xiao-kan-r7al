@@ -1,11 +1,30 @@
-import { can, esc } from "../ui.js";
+import { can, esc, table } from "../ui.js";
 import { glyphApi } from "./api.js";
 import { currentProof, selectProof } from "./state.js";
-import { states } from "./labels.js";
+import { finders, states } from "./labels.js";
 import { doAction, empty, feedback, fields, pilot, proofMark } from "./layout.js";
 import { glyphCell } from "./glyph-cell.js";
 
 const feedbackBlock = '<p data-feedback class="glyph-feedback" role="status" hidden></p>';
+
+function benchmarkPanel(batch, runnable) {
+  const trigger = !batch ? "开始对比测评" : batch.state === "done" ? "开测新一批" : "续跑本批测评";
+  let body;
+  if (!batch) {
+    body = `<p>还没有测评批次。开测时把当前已锁稿和字库样册圈定为一批，排队和计算期间新锁的稿、新登记的字库留到下一批。</p>`;
+  } else if (batch.state !== "done") {
+    body = `<p>第 ${batch.id} 批测评中：${batch.proofs} 份锁稿 × 两种找法，已完成 ${batch.finished}/${batch.proofs * 2} 组。两边都算完后在此给出各自命中数。</p>`;
+  } else {
+    const line = batch.methods.line, single = batch.methods.glyph;
+    const verdict = line.hits === single.hits ? "两种找法命中持平。"
+      : `本批${finders[line.hits > single.hits ? "line" : "glyph"]}更常把审校员选的字体排进前三。`;
+    body = `<p>第 ${batch.id} 批 · ${batch.proofs} 份锁稿 · ${batch.faces} 个字库包</p>
+      ${table(["找法", "命中前三", "参测字数"], Object.entries(batch.methods).map(([key, row]) => [finders[key], row.hits, row.tested]))}
+      <p>${esc(verdict)}</p>`;
+  }
+  return `<section class="benchmark"><h2>检索口径测评</h2>${body}
+    ${runnable ? `<button id="benchmark" type="button">${trigger}</button>` : ""}</section>`;
+}
 
 export async function review(root) {
   const proofs = await glyphApi.proofs();
@@ -16,7 +35,10 @@ export async function review(root) {
     root.innerHTML = heading + empty("没有可审校的稿件。", "/#desk", "去稿台登记");
     return;
   }
-  const {proof, glyphs} = await glyphApi.review(chosen.code);
+  const [{proof, glyphs}, {batch}] = await Promise.all([
+    glyphApi.review(chosen.code),
+    glyphApi.benchmark(),
+  ]);
   const revision = proof.revision;
   const editable = proof.state === "draft" && can("operator", "admin");
   const lockable = proof.state === "draft" && can("admin");
@@ -38,7 +60,7 @@ export async function review(root) {
         <button id="lock" type="button">锁稿签发</button></div>` : ""}
       ${proof.state === "locked" ? '<a class="press-link" href="/#delivery">查看交付清单</a>' : ""}
     </aside>
-  </div>`;
+  </div>${benchmarkPanel(batch, can("operator", "admin"))}`;
   root.querySelector("[data-proof-switch]").onchange = async event => {
     selectProof(event.target.value);
     try {
@@ -62,6 +84,13 @@ export async function review(root) {
   if (lock) lock.onclick = action(lock, async () => {
     await glyphApi.lock(proof.code, revision);
     return "锁稿成功。交付清单已可下载。";
+  });
+  const measure = root.querySelector("#benchmark");
+  if (measure) measure.onclick = action(measure, async () => {
+    feedback(root)("正在按两种找法逐稿计算……");
+    const result = await glyphApi.measure();
+    const line = result.methods.line, single = result.methods.glyph;
+    return `第 ${result.id} 批测评完成：按行命中 ${line.hits}/${line.tested}，单字命中 ${single.hits}/${single.tested}。`;
   });
   const edit = root.querySelector("[data-revision]");
   if (edit) edit.onsubmit = action(edit.querySelector("button"), async () => {

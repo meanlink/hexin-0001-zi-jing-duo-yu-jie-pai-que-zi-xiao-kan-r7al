@@ -56,6 +56,8 @@ docker compose exec -T backend python -m scripts.seed_demo
 
 草稿可更新文案，修订后保留仍适用的指派，移除消失字符的指派并清理旧版候选。审校锁稿需要当前版每个可见字符均有授权合规的覆盖。锁稿后固定字库与字符清单。CSV 使用 UTF-8 BOM，展示在网页上的字形采用界面字体。实际字体文件由制版方管理，样册登记的是人工核对的覆盖数据和文件名。组合符和变体选择符由 API 明确拒绝。
 
+逐字审校页可发起检索口径测评：以当时已锁稿的字体指派为答案，把按行取上下文与只取单字两种找法各跑一遍，照常按覆盖和用途许可筛选，统计各自把审校员所选字体排进前三的命中数。开测时圈定已锁稿件和字库样册为一批，排队或计算期间新锁的稿、新登记的字库留到下一批；每稿每个字算一次，没有候选也算没命中。计算中断后续跑原批次，已算完的稿件不重复计入；等同一批两种找法都算完，工作台给出各自的命中数和参测字数。
+
 共享枚举 `UseKind`、`LicenseKind`、`ProofState` 在 `backend/glyph/models.py`、`backend/glyph/schemas.py`、`backend/migrations/10_glyph.sql` 与 `frontend/glyph/labels.js`。角色和任务状态位于 `backend/infra/roles.py`、`frontend/session.js`。
 
 许可证见 [LICENSE](LICENSE)。
