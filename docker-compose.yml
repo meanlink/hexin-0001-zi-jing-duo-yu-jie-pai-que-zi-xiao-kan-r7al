@@ -1,0 +1,92 @@
+name: hexin-glyph
+x-platform: &platform
+  image: hexin-glyph-python:local
+  environment:
+    DB_ENGINE: postgres
+    DB_PASSWORD: ${DB_PASSWORD:-hexin-db-demo}
+    REDIS_URL: redis://redis:6379/0
+    APP_NAME: ${COMPOSE_PROJECT_NAME:-hexin-glyph}
+    SEED_DEMO: ${SEED_DEMO:-true}
+    DEMO_PASSWORD: ${DEMO_PASSWORD:-Demo2026!}
+    JWT_SECRET: ${JWT_SECRET:-hexin-demo-jwt-key-change-before-deployment}
+  volumes:
+    - artifacts:/artifacts
+services:
+  backend:
+    <<: *platform
+    build: ./backend
+    container_name: ${COMPOSE_PROJECT_NAME:-hexin-glyph}-backend
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-19340}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, python, -c, "from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 2s
+      timeout: 4s
+      retries: 25
+  worker:
+    <<: *platform
+    pull_policy: never
+    command: [python, worker.py]
+    restart: on-failure
+    container_name: ${COMPOSE_PROJECT_NAME:-hexin-glyph}-worker
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, python, -c, "from pathlib import Path; from time import time; raise SystemExit(time() - Path('/tmp/hexin-heartbeat').stat().st_mtime > 25)"]
+      interval: 2s
+      timeout: 4s
+      retries: 25
+  frontend:
+    build: ./frontend
+    container_name: ${COMPOSE_PROJECT_NAME:-hexin-glyph}-frontend
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-18340}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD-SHELL, 'wget -qO /dev/null http://127.0.0.1/']
+      interval: 2s
+      timeout: 4s
+      retries: 25
+  db:
+    container_name: ${COMPOSE_PROJECT_NAME:-hexin-glyph}-db
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-hexin-db-demo}
+      POSTGRES_DB: business
+    ports:
+      - "127.0.0.1:${DB_PORT:-17840}:5432"
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD, pg_isready, -U, app, -d, business]
+      interval: 2s
+      timeout: 4s
+      retries: 45
+  redis:
+    image: redis:7-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-hexin-glyph}-redis
+    command: [redis-server, --appendonly, 'yes']
+    volumes:
+      - redis:/data
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 2s
+      timeout: 4s
+      retries: 25
+volumes:
+  database:
+  redis:
+  artifacts:

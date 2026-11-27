@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700&display=swap');
+
+:root {
+  --ink: oklch(29% .047 37);
+  --paper: oklch(95% .032 84);
+  --panel: oklch(92% .042 82);
+  --accent: oklch(45% .140 33);
+  --good: oklch(44% .077 152);
+  --muted: oklch(47% .044 55);
+  --rule: oklch(74% .055 65);
+  --display: "Ma Shan Zheng", "Kaiti SC", KaiTi, serif;
+  --body: "Noto Serif SC", "Noto Serif CJK SC", "Songti SC", STSong, serif;
+}
+body { background: var(--paper); color: var(--ink); font-family: var(--body); }
+.glyph-pilot { border-block-start: 2px solid var(--ink); border-block-end: 1px solid var(--rule); margin-block: 1.4rem 1.9rem; padding-block: 1rem 1.55rem; }
+.glyph-pilot p { color: var(--accent); font-size: .78rem; margin: 0; letter-spacing: .13em; }
+.glyph-pilot h1 { margin: .25rem 0 .6rem; font: 400 clamp(2.4rem, 4.8vw, 4.6rem)/1.12 var(--display); }
+.glyph-pilot div { color: var(--muted); font-size: clamp(.9rem, 1.1vw, 1.05rem); }
+.press-grid { display: grid; grid-template-columns: minmax(0, 1.72fr) minmax(270px, 1fr); align-items: start; gap: clamp(1.25rem, 4vw, 3rem); }
+.press-proof { margin: 0 0 1.8rem; padding: 1.15rem 1.4rem; border: 1px solid var(--ink); outline: 1px solid var(--rule); outline-offset: -5px; background: var(--panel); }
+.press-proof figcaption { display: flex; justify-content: space-between; gap: .8rem; border-bottom: 1px dotted var(--rule); padding-bottom: .65rem; color: var(--accent); font-size: .78rem; }
+.press-proof-copy { margin-block: 1.35rem; font: 400 clamp(2.35rem, 6vw, 5rem)/1.32 var(--display); white-space: pre-wrap; overflow-wrap: anywhere; }
+.press-proof p { margin: .7rem 0 0; font-size: .84rem; color: var(--muted); }
+.glyph-ledger { margin: 0; padding: 0; list-style: none; }
+.glyph-ledger li { border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem; padding: .75rem .4rem; align-items: center; }
+.glyph-ledger strong, .glyph-ledger small { display: block; }
+.glyph-ledger small { color: var(--muted); margin-top: .3rem; }
+.press-side, .press-inset { border-inline-start: 1px solid var(--rule); padding-inline-start: 1.25rem; }
+.glyph-work h2 { font-size: clamp(1.24rem, 1.5vw, 1.8rem); margin: 0 0 1rem; }
+.glyph-work label { display: grid; gap: .3rem; margin-bottom: .65rem; }
+.glyph-work select, .glyph-work input, .glyph-work textarea {
+  width: 100%; background: var(--paper); border: 1px solid var(--rule); color: var(--ink); font: inherit; padding: .55rem;
+}
+.glyph-work textarea { resize: vertical; min-height: 4.25rem; }
+.glyph-work input:focus, .glyph-work textarea:focus, .glyph-work select:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+.glyph-work button, a.press-link {
+  display: inline-block; padding: .48rem .85rem; border: 1px solid var(--accent); background: var(--paper);
+  color: var(--accent); font: inherit; text-decoration: none; cursor: pointer; transition: transform 150ms cubic-bezier(.2,.8,.2,1);
+}
+.glyph-work button:hover:not(:disabled), a.press-link:hover { transform: translateY(-2px); }
+.glyph-work button:disabled { opacity: .45; cursor: wait; }
+.glyph-work a { color: var(--accent); }
+.glyph-empty { border: 1px dashed var(--rule); padding: 1rem; }
+.glyph-feedback { background: var(--panel); border-inline-start: 3px solid var(--accent); padding: .8rem; color: var(--ink); }
+.press-control { display: flex; flex-wrap: wrap; align-items: end; gap: .75rem; margin-bottom: 1.2rem; }
+.press-control label { flex: 1 1 12rem; margin: 0; }
+.press-control button { flex: 0 0 auto; }
+.press-foot { color: var(--muted); font-size: .86rem; }
+@media (max-width: 830px) { .press-grid { grid-template-columns: minmax(0, 1fr) minmax(230px, .8fr); gap: 1.2rem; } }
+@media (max-width: 680px) { .press-grid { grid-template-columns: 1fr; } .press-side, .press-inset { border-inline-start: 0; border-block-start: 1px solid var(--rule); padding: 1.3rem 0 0; } }
+@media (prefers-reduced-motion: reduce) { .glyph-work button, a.press-link { transition: none; } }

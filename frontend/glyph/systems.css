@@ -1,0 +1,29 @@
+.face-shelf { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.1rem 1.45rem; }
+.face-specimen { margin: 0; min-width: 0; border-top: 3px double var(--ink); padding: .75rem .2rem .5rem; }
+.face-specimen figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .3rem; font-size: .76rem; color: var(--muted); }
+.face-specimen h3 { font: 400 clamp(1.5rem, 3vw, 2.35rem)/1.1 var(--display); margin: .65rem 0; }
+.specimen-run { color: var(--accent); font-size: .95rem; min-height: 2.7em; overflow-wrap: anywhere; }
+.face-specimen details { font-size: .83rem; overflow-wrap: anywhere; }
+.glyph-strip { display: grid; gap: .55rem; }
+.glyph-cell {
+  margin: 0; display: grid; grid-template-columns: 5.4rem minmax(0, 1fr) minmax(7.5rem, 11rem);
+  align-items: center; gap: .8rem; border-block-start: 1px solid var(--rule); padding-block: .6rem;
+}
+.glyph-cell .glyph-tile { font: 400 2.35rem/1 var(--display); display: block; }
+.glyph-cell code { font-size: .72rem; color: var(--muted); }
+.glyph-cell p { margin-block: .2rem; }
+.glyph-cell small { color: var(--muted); }
+.glyph-cell .flag { color: var(--accent); }
+.glyph-cell .ok { color: var(--good); }
+.glyph-cell select { margin-bottom: .35rem; }
+.glyph-rank { padding-left: 1.35rem; margin: 0; font-size: .77rem; color: var(--muted); }
+.glyph-rank li { padding: .11rem; }
+.glyph-manifest { margin: 0 0 1.2rem; padding: 0; list-style: none; }
+.glyph-manifest li {
+  padding: .7rem .2rem; border-top: 1px solid var(--rule); display: flex; gap: 1rem;
+  justify-content: space-between; flex-wrap: wrap;
+}
+.glyph-manifest code { display: block; color: var(--muted); margin-top: .25rem; }
+.manifest-word { font: 400 2.1rem/1.2 var(--display); overflow-wrap: anywhere; }
+@media (max-width: 760px) { .glyph-cell { grid-template-columns: 3.6rem 1fr; } .glyph-cell form { grid-column: 2; } }
+@media (max-width: 480px) { .face-shelf { grid-template-columns: 1fr; } }

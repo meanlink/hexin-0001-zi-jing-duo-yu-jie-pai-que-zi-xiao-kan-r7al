@@ -1,0 +1,16 @@
+@import url("./glyph/press.css");
+@import url("./glyph/systems.css");
+
+:root {
+  --surface: oklch(97% .028 87);
+  --line: var(--rule);
+  --heading-font: var(--display);
+  --body-font: var(--body);
+}
+
+.masthead { border-top: .3rem solid var(--accent); }
+.main-nav { background: var(--panel); }
+.brand strong { letter-spacing: .04em; }
+.signoff { margin-top: 1.6rem; }
+.login-brand { border-top: .22rem solid var(--accent); }
+.login-brand h1 { font-size: clamp(2.25rem, 4.3vw, 4.4rem); }
